@@ -440,7 +440,8 @@ def cosine_scheduler(base_value, final_value, epochs, niter_per_ep, warmup_epoch
         [final_value + 0.5 * (base_value - final_value) * (1 + math.cos(math.pi * i / (len(iters)))) for i in iters])
 
     schedule = np.concatenate((warmup_schedule, schedule))
-
+    print(f"The length of schedule {len(schedule)}")
+    print(f"The number of epochs {epochs} and iter {niter_per_ep}")
     assert len(schedule) == epochs * niter_per_ep
     return schedule
 

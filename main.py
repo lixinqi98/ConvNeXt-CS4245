@@ -19,7 +19,7 @@ import os
 from pathlib import Path
 
 from timm.data.mixup import Mixup
-from timm.models import create_model
+# from timm.models import create_model
 from timm.loss import LabelSmoothingCrossEntropy, SoftTargetCrossEntropy
 from timm.utils import ModelEma
 from optim_factory import create_optimizer, LayerDecayValueAssigner
@@ -31,6 +31,8 @@ from utils import NativeScalerWithGradNormCount as NativeScaler
 import utils
 import models.convnext
 import models.convnext_isotropic
+
+from model_choose import model_choose
 
 def str2bool(v):
     """
@@ -275,14 +277,16 @@ def main(args):
             prob=args.mixup_prob, switch_prob=args.mixup_switch_prob, mode=args.mixup_mode,
             label_smoothing=args.smoothing, num_classes=args.nb_classes)
 
-    model = create_model(
-        args.model, 
-        pretrained=False, 
-        num_classes=args.nb_classes, 
-        drop_path_rate=args.drop_path,
-        layer_scale_init_value=args.layer_scale_init_value,
-        head_init_scale=args.head_init_scale,
-        )
+    # model = create_model(
+    #     args.model, 
+    #     pretrained=False, 
+    #     num_classes=args.nb_classes, 
+    #     drop_path_rate=args.drop_path,
+    #     layer_scale_init_value=args.layer_scale_init_value,
+    #     head_init_scale=args.head_init_scale,
+    #     )
+    model = model_choose(args.model, True)
+
 
     if args.finetune:
         if args.finetune.startswith('https'):
