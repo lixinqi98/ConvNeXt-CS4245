@@ -23,6 +23,8 @@ from timm.data.mixup import Mixup
 from timm.loss import LabelSmoothingCrossEntropy, SoftTargetCrossEntropy
 from timm.utils import ModelEma
 from optim_factory import create_optimizer, LayerDecayValueAssigner
+from torchsummary import summary
+
 
 from datasets import build_dataset
 from engine import train_one_epoch, evaluate
@@ -286,6 +288,7 @@ def main(args):
     #     head_init_scale=args.head_init_scale,
     #     )
     model = model_choose(args.model, False)
+    print(summary(model, input_size=(3, 32, 32)))
 
 
     if args.finetune:
