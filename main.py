@@ -285,7 +285,7 @@ def main(args):
     #     layer_scale_init_value=args.layer_scale_init_value,
     #     head_init_scale=args.head_init_scale,
     #     )
-    model = model_choose(args.model, True)
+    model = model_choose(args.model, False)
 
 
     if args.finetune:

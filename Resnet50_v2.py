@@ -1,6 +1,6 @@
 """
-Initial Version of ResNet50
-https://pytorch.org/vision/stable/_modules/torchvision/models/resnet.html#resnet50
+V2: change stage compute ratio
+Follow the Swin Transformer design, change number of blocks in each stage from (3,4,6,3) to (3,3,9,3)
 """
 from typing import Type, Any, Callable, Union, List, Optional
 
@@ -283,7 +283,7 @@ def _resnet(
         model.load_state_dict(state_dict)
     return model
 
-def resnet50_v1(pretrained: bool = False, progress: bool = True, **kwargs: Any) -> ResNet:
+def resnet50_v2(pretrained: bool = False, progress: bool = True, **kwargs: Any) -> ResNet:
     r"""ResNet-50 model from
     `"Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>`_.
 
@@ -291,4 +291,4 @@ def resnet50_v1(pretrained: bool = False, progress: bool = True, **kwargs: Any) 
         pretrained (bool): If True, returns a model pre-trained on ImageNet
         progress (bool): If True, displays a progress bar of the download to stderr
     """
-    return _resnet("resnet50", Bottleneck, [3, 4, 6, 3], pretrained, progress, **kwargs)
+    return _resnet("resnet50", Bottleneck, [3, 3, 9, 3], pretrained, progress, **kwargs)
