@@ -1,6 +1,5 @@
 """
-V4: increase the network width to the same number of channels as Swin-T's 
-from 64 -> 96
+V5: invert bottlenect
 """
 from typing import Type, Any, Callable, Union, List, Optional
 
@@ -113,14 +112,16 @@ class Bottleneck(nn.Module):
         super().__init__()
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
-        width = int(planes * (base_width / 96.0)) * groups
+        # width = int(planes * (base_width / 96.0)) * groups
+        width = planes * self.expansion
+        # print(f"the inplanes is {inplanes}, planes is {planes} and width is {width}")
         # Both self.conv2 and self.downsample layers downsample the input when stride != 1
         self.conv1 = conv1x1(inplanes, width)
         self.bn1 = norm_layer(width)
         self.conv2 = conv3x3(width, width, stride, groups, dilation)
         self.bn2 = norm_layer(width)
-        self.conv3 = conv1x1(width, planes * self.expansion)
-        self.bn3 = norm_layer(planes * self.expansion)
+        self.conv3 = conv1x1(width, planes)
+        self.bn3 = norm_layer(planes)
         self.relu = nn.ReLU(inplace=True)
         self.downsample = downsample
         self.stride = stride
@@ -194,13 +195,19 @@ class ResNet(nn.Module):
             norm_layer(self.dims[0])
         )
         self.downsample_layers.append(stem)
+        for i in range(3):
+            downsample_layer = nn.Sequential(
+                    norm_layer(self.dims[i]),
+                    nn.Conv2d(self.dims[i], self.dims[i+1], kernel_size=2, stride=2),
+            )
+            self.downsample_layers.append(downsample_layer)
 
         self.layer1 = self._make_layer(block, self.dims[0], layers[0])
         self.layer2 = self._make_layer(block, self.dims[1], layers[1], stride=2, dilate=replace_stride_with_dilation[0])
         self.layer3 = self._make_layer(block, self.dims[2], layers[2], stride=2, dilate=replace_stride_with_dilation[1])
         self.layer4 = self._make_layer(block, self.dims[3], layers[3], stride=2, dilate=replace_stride_with_dilation[2])
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.fc = nn.Linear(self.dims[3] * block.expansion, num_classes)
+        self.fc = nn.Linear(self.dims[3], num_classes)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -233,20 +240,9 @@ class ResNet(nn.Module):
         if dilate:
             self.dilation *= stride
             stride = 1
-        if stride != 1 or self.inplanes != planes * block.expansion:
-            downsample = nn.Sequential(
-                conv1x1(self.inplanes, planes * block.expansion, stride),
-                # nn.Conv2d(self.inplanes, planes * block.expansion, kernel_size=4, stride=4),
-                norm_layer(planes * block.expansion),
-            )
-
         layers = []
-        layers.append(
-            block(
-                self.inplanes, planes, stride, downsample, self.groups, self.base_width, previous_dilation, norm_layer
-            )
-        )
-        self.inplanes = planes * block.expansion
+
+        self.inplanes = planes
         for _ in range(1, blocks):
             layers.append(
                 block(
@@ -263,15 +259,18 @@ class ResNet(nn.Module):
 
     def _forward_impl(self, x: Tensor) -> Tensor:
         # See note [TorchScript super()]
-        # print(f"the input size 1 is {x.shape}")
+
         x = self.downsample_layers[0](x)
-        # print(f"the input size 2 is {x.shape}")
+
         x = self.layer1(x)
-        # print(f"the input size 3 is {x.shape}")
+        x = self.downsample_layers[1](x)
+
         x = self.layer2(x)
-        # print(f"the input size 4 is {x.shape}")
+        x = self.downsample_layers[2](x)
+
         x = self.layer3(x)
-        # print(f"the input size 5 is {x.shape}")
+        x = self.downsample_layers[3](x)
+
         x = self.layer4(x)
 
         x = self.avgpool(x)
@@ -297,7 +296,7 @@ def _resnet(
         model.load_state_dict(state_dict)
     return model
 
-def resnet50_v4(pretrained: bool = False, progress: bool = True, **kwargs: Any) -> ResNet:
+def resnet50_v5(pretrained: bool = False, progress: bool = True, **kwargs: Any) -> ResNet:
     r"""ResNet-50 model from
     `"Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>`_.
 
