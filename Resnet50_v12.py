@@ -296,7 +296,7 @@ def _resnet(
         model.load_state_dict(state_dict)
     return model
 
-def resnet50_v8(pretrained: bool = False, progress: bool = True, **kwargs: Any) -> ResNet:
+def resnet50_v12(pretrained: bool = False, progress: bool = True, **kwargs: Any) -> ResNet:
     r"""ResNet-50 model from
     `"Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>`_.
 
