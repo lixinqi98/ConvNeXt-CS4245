@@ -116,7 +116,7 @@ class Bottleneck(nn.Module):
         width = planes * self.expansion
         # print(f"the inplanes is {inplanes}, planes is {planes} and width is {width}")
         # Both self.conv2 and self.downsample layers downsample the input when stride != 1
-        self.conv1 = nn.Conv2d(inplanes, inplanes, kernel_size=11, padding=3, groups=inplanes) # depthwise convolution
+        self.conv1 = nn.Conv2d(inplanes, inplanes, kernel_size=11, padding=5, groups=inplanes) # depthwise convolution
         self.bn1 = norm_layer(inplanes)
         self.conv2 = conv1x1(inplanes, width)
         self.bn2 = norm_layer(width)
