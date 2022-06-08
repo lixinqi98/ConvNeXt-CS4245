@@ -56,7 +56,7 @@ class BasicBlock(nn.Module):
     ) -> None:
         super().__init__()
         if norm_layer is None:
-            norm_layer = nn.LayerNorm
+            norm_layer = nn.BatchNorm2d
         if groups != 1 or base_width != 96:
             raise ValueError("BasicBlock only supports groups=1 and base_width=64")
         if dilation > 1:
@@ -64,7 +64,7 @@ class BasicBlock(nn.Module):
         # Both self.conv1 and self.downsample layers downsample the input when stride != 1
         self.conv1 = conv3x3(inplanes, planes, stride)
         self.bn1 = norm_layer(planes)
-        self.gelu = nn.GELU(inplace=True)
+        self.gelu = nn.GELU()
         self.conv2 = conv3x3(planes, planes)
         self.bn2 = norm_layer(planes)
         self.downsample = downsample
@@ -111,18 +111,18 @@ class Bottleneck(nn.Module):
     ) -> None:
         super().__init__()
         if norm_layer is None:
-            norm_layer = nn.LayerNorm
+            norm_layer = nn.BatchNorm2d
         # width = int(planes * (base_width / 96.0)) * groups
         width = planes * self.expansion
         # print(f"the inplanes is {inplanes}, planes is {planes} and width is {width}")
         # Both self.conv2 and self.downsample layers downsample the input when stride != 1
-        self.conv1 = nn.Conv2d(inplanes, inplanes, kernel_size=11, padding=3, groups=inplanes) # depthwise convolution
+        self.conv1 = nn.Conv2d(inplanes, inplanes, kernel_size=7, padding=3, groups=inplanes) # depthwise convolution
         self.bn1 = norm_layer(inplanes)
         self.conv2 = conv1x1(inplanes, width)
         self.bn2 = norm_layer(width)
         self.conv3 = conv1x1(width, planes)
         self.bn3 = norm_layer(planes)
-        self.gelu = nn.GELU(inplace=True)
+        self.gelu = nn.GELU()
         self.downsample = downsample
         self.stride = stride
 
@@ -131,11 +131,11 @@ class Bottleneck(nn.Module):
 
         out = self.conv1(x)
         out = self.bn1(out)
-        # out = self.gelu(out)
+        out = self.gelu(out)
 
         out = self.conv2(out)
         # out = self.bn2(out)
-        out = self.gelu(out)
+        # out = self.gelu(out)
 
         out = self.conv3(out)
         # out = self.bn3(out)
@@ -164,7 +164,7 @@ class ResNet(nn.Module):
         super().__init__()
         # _log_api_usage_once(self)
         if norm_layer is None:
-            norm_layer = nn.LayerNorm
+            norm_layer = nn.BatchNorm2d
         self._norm_layer = norm_layer
 
         self.inplanes = 96
@@ -212,7 +212,7 @@ class ResNet(nn.Module):
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
-            elif isinstance(m, (nn.LayerNorm, nn.GroupNorm)):
+            elif isinstance(m, (nn.BatchNorm2d, nn.GroupNorm)):
                 nn.init.constant_(m.weight, 1)
                 nn.init.constant_(m.bias, 0)
 
