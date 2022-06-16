@@ -42,7 +42,7 @@ The original design of the computation distribution across stages in ResNet was 
 We use this stage compute ratio from now on.
 
 #### Changing stem to "Patchify"
-The stem cell in standard ResNet contains a $7\times7$ convolution layer with stride 2, followed by a max pool, which results in a $4\times4$ downsampling of the input images. While in ViTs, a "pachify" strategy is used as the stem cell, which corresponds to a larger kernel size. Swin Transformer uses a similar "pachify" layer, but with a smaller kernel size of 4. Therefore, we substitute the ResNet-style stem cell with a patchify layer implemented using a $4\times4$, stride 4 convolutional layer. 
+The stem cell in standard ResNet contains a 7x7 convolution layer with stride 2, followed by a max pool, which results in a 4x4 downsampling of the input images. While in ViTs, a "pachify" strategy is used as the stem cell, which corresponds to a larger kernel size. Swin Transformer uses a similar "pachify" layer, but with a smaller kernel size of 4. Therefore, we substitute the ResNet-style stem cell with a patchify layer implemented using a 4x4, stride 4 convolutional layer. 
 We will use the "pachify" stem cell in the network.
 
 
@@ -57,7 +57,7 @@ We will use inverted bottleneck afterward.
 
 
 ### 4. Large Kernel Sizes
-In this part, the paper focuses on the effect of large convolutional kernels. While large kernel sizes have been used in the past with ConvNets, the best way is to stack small kernel-sized ($3\times3$) Conv layers, which are more efficient on modern GPUs[5]. Although Swin Transformers reintroduced the local window to the self-attention block, the window size is at least $7\times7$, larger than the ResNet kernel size of $3\times3$. 
+In this part, the paper focuses on the effect of large convolutional kernels. While large kernel sizes have been used in the past with ConvNets, the best way is to stack small kernel-sized ($3\times3$) Conv layers, which are more efficient on modern GPUs[5]. Although Swin Transformers reintroduced the local window to the self-attention block, the window size is at least $7\times7$, larger than the ResNet kernel size of 3x3. 
 
 #### Moving up depthwise conv layer
 To explore large kernels, one prerequisite is to move up the position of the depthwise Conv layer. As we have an inverted bottleneck block, the complex/inefficient models will have fewer channels, while the efficient $1\times1$ layers will do the heavy lifting.
@@ -73,7 +73,7 @@ In this section, the authors investigate several other architecture differences 
 There are many activation functions, but the Rectified Linear Unit (ReLU)[6] is still extensively used in ConvNets. The Gaussian Error Linear Unit (GELU)[7] is used in the most advanced Transformers. Therefore, the authors decide to substitute the ReLU with GELU, 
 
 #### Fewer activation functions
-Transformer blocks usually have fewer normalization layers as well. In this paper, researchers remove two BatchNorm (BN) layers, leaving only one BN layer before the Conv $1\times1$ layers.
+Transformer blocks usually have fewer normalization layers as well. In this paper, researchers remove two BatchNorm (BN) layers, leaving only one BN layer before the Conv 1x1 layers.
 
 #### Substituting BN with LN
 BatchNorm is an important component in ConvNets because it improves convergence and reduces overfitting. However, BN also has many disadvantages. The simpler Layer Normalization (LN) has been used in Transformers, resulting in good performance across different application scenarios. Therefore, substituting BN with LN is a reasonable experiment. 
@@ -111,14 +111,20 @@ We followed the steps of constructing ConvNeXt from ConvNet in the paper, and re
 ## References
 [1] Liu, Ze, et al. "Swin transformer: Hierarchical vision transformer using shifted windows." Proceedings of the IEEE/CVF International Conference on Computer Vision. 2021.
 
+
 [2] Liu, Zhuang, et al. "A ConvNet for the 2020s." arXiv preprint arXiv:2201.03545 (2022).
+
 
 [3] Krizhevsky, Alex, and Geoffrey Hinton. "Learning multiple layers of features from tiny images." (2009): 7.
 
+
 [4] Xie, Saining, et al. "Aggregated residual transformations for deep neural networks." Proceedings of the IEEE conference on computer vision and pattern recognition. 2017.
+
 
 [5] Lavin, Andrew, and Scott Gray. "Fast algorithms for convolutional neural networks." Proceedings of the IEEE conference on computer vision and pattern recognition. 2016.
 
+
 [6] Nair, Vinod, and Geoffrey E. Hinton. "Rectified linear units improve restricted boltzmann machines." Icml. 2010.
+
 
 [7] Hendrycks, Dan, and Kevin Gimpel. "Gaussian error linear units (gelus)." arXiv preprint arXiv:1606.08415 (2016).
