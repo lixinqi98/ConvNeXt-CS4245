@@ -1,6 +1,7 @@
 ## Reproduction Blog: A ConvNet for the 2020s
 
-## Authors
+
+**Authors**
 Xinqi Li - 5478073 - X.Li-63@student.tudelft.nl
 
 Haoran Wang - 5468175 - H.Wang-46@student.tudelft.nl
