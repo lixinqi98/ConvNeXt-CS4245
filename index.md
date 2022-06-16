@@ -48,7 +48,7 @@ We will use the "pachify" stem cell in the network.
 
 ### 2. ResNeXt-ify
 In this part, the authors try to adopt the idea of ResNeXt[4], which has a better FLOPs/accuracy trade-off than a vanilla ResNet. The core component of the ResNeXt is grouped convolution, where the convolutional filters are separated into different groups. More precisely, ResNeXt employs grouped convolution for the 3×3 convolutional layer in a bottleneck block, which can significantly reduce the FLOPs. The network width is expanded to compensate for the capacity loss.
-In this case, the authors use depthwise convolution, a special case of grouped convolution where the number of groups equals the number of channels. The combination of depthwise Conv and $1\times1$ Convs leads to a separation of spatial and channel mixing. The use of depthwise convolution effectively reduces the network FLOPs and also the accuracy. Therefore, the authors decide to increase the network width to the same number of channels as Swin-T's (from 64 to 96). 
+In this case, the authors use depthwise convolution, a special case of grouped convolution where the number of groups equals the number of channels. The combination of depthwise Conv and 1x1 Convs leads to a separation of spatial and channel mixing. The use of depthwise convolution effectively reduces the network FLOPs and also the accuracy. Therefore, the authors decide to increase the network width to the same number of channels as Swin-T's (from 64 to 96). 
 
 
 ### 3. Inverted Bottleneck
@@ -57,10 +57,10 @@ We will use inverted bottleneck afterward.
 
 
 ### 4. Large Kernel Sizes
-In this part, the paper focuses on the effect of large convolutional kernels. While large kernel sizes have been used in the past with ConvNets, the best way is to stack small kernel-sized ($3\times3$) Conv layers, which are more efficient on modern GPUs[5]. Although Swin Transformers reintroduced the local window to the self-attention block, the window size is at least $7\times7$, larger than the ResNet kernel size of 3x3. 
+In this part, the paper focuses on the effect of large convolutional kernels. While large kernel sizes have been used in the past with ConvNets, the best way is to stack small kernel-sized (3x3) Conv layers, which are more efficient on modern GPUs[5]. Although Swin Transformers reintroduced the local window to the self-attention block, the window size is at least 7x7, larger than the ResNet kernel size of 3x3. 
 
 #### Moving up depthwise conv layer
-To explore large kernels, one prerequisite is to move up the position of the depthwise Conv layer. As we have an inverted bottleneck block, the complex/inefficient models will have fewer channels, while the efficient $1\times1$ layers will do the heavy lifting.
+To explore large kernels, one prerequisite is to move up the position of the depthwise Conv layer. As we have an inverted bottleneck block, the complex/inefficient models will have fewer channels, while the efficient 1x1 layers will do the heavy lifting.
 
 #### Increasing the kernel size
 With all the preparations, the benefit of using larger kernel-sized convolutions is significant. The authors experimented with several kernel sizes, including 3, 5, 7, 9, and 11. 
